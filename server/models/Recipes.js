@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Dishes = sequelize.define("Dishes", {
+  const Recipes = sequelize.define("Recipes", {
     title: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -11,7 +11,9 @@ module.exports = (sequelize, DataTypes) => {
         return this.getDataValue("ingredients").split(";");
       },
       set(value) {
-        this.setDataValue("ingredients", value.join(";"));
+        Array.isArray(value)
+          ? this.setDataValue("ingredients", value.join(";"))
+          : this.setDataValue("ingredients", value);
       },
     },
     instructions: {
@@ -21,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
         return this.getDataValue("instructions").split(";");
       },
       set(value) {
-        this.setDataValue("instructions", value.join(";"));
+        Array.isArray(value)
+          ? this.setDataValue("instructions", value.join(";"))
+          : this.setDataValue("instructions", value);
       },
     },
     image: {
@@ -29,5 +33,5 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  return Dishes;
+  return Recipes;
 };
