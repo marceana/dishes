@@ -11,16 +11,32 @@
 
 .App {
   width: 100vw;
-  height: auto;
-  display: flex;
-  align-items: center;
-  padding-top: 40px;
-  flex-direction: column;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 
 body {
   margin: 0;
   padding: 0;
+}
+
+/* NAVBAR */
+
+.navbar {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  font-family: Arial, Helvetica, sans-serif;
+  border-bottom: 1px solid black;
+}
+
+.navbar a {
+  margin-right: 20px;
+  text-decoration: none;
+  color: black;
 }
 
 .recipe {
@@ -72,22 +88,13 @@ body {
 
 /* CREATE RECIPE PAGE CSS */
 
-.title {
-  font-family: "Roboto", sans-serif;
-  font-size: 30px;
-  font-weight: 500;
-  color: #343436;
-  margin-bottom: 20px;
-}
-
 .createRecipePage {
   font-family: "Roboto", sans-serif;
   width: 100vw;
-  height: 100vh;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background-color: #9dbc98; */
 }
 
 .formContainer {
@@ -98,8 +105,15 @@ body {
   padding: 20px;
   background-color: white;
   border-radius: 30px;
-  padding-left: 20px;
-  padding-right: 20px;
+  align-self: center;
+}
+
+.title {
+  font-family: "Roboto", sans-serif;
+  font-size: 30px;
+  font-weight: 500;
+  color: #343436;
+  margin-bottom: 20px;
 }
 
 .formContainer label {

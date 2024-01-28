@@ -15,7 +15,7 @@ function CreateRecipe() {
     title: Yup.string().required("Campo obrigatório"),
     ingredients: Yup.array().of(Yup.string().required("Campo obrigatório")),
     instructions: Yup.array().of(Yup.string().required("Campo obrigatório")),
-    image: Yup.string().required("Campo obrigatório"),
+    image: Yup.string().required("Campo obrigatório e deve ser uma url!"),
   });
 
   const onSubmit = (data) => {
