@@ -3,6 +3,7 @@ import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import CreateRecipe from "./pages/CreateRecipe";
+import Recipe from "./pages/Recipe";
 
 function App() {
   const [color, changeColor] = useState("#E5E6E1");
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/createrecipe" exact element={<CreateRecipe />} />
+          <Route path="/recipe/:id" exact element={<Recipe />} />
         </Routes>
       </Router>
     </div>

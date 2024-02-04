@@ -1,9 +1,11 @@
 import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [listOfRecipes, setLisOfRecipes] = useState([]);
+  let navigate = useNavigate();
 
   useEffect(() => {
     axios.get("http://localhost:3001/recipes").then(
@@ -25,7 +27,14 @@ function Home() {
       {listOfRecipes.map((value, index) => {
         const backgroundColor = getRandomColor();
         return (
-          <div className="recipe" key={index} style={{ backgroundColor }}>
+          <div
+            className="recipe"
+            key={index}
+            style={{ backgroundColor }}
+            onClick={() => {
+              navigate(`/recipe/${value.id}`);
+            }}
+          >
             <div className="title">{value.title}</div>
             <img className="image" src={value.image} alt={value.title} />
             {/* <div className="ingredients">

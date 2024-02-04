@@ -13,4 +13,10 @@ router.post("/", async (req, res) => {
   res.json(recipe);
 });
 
+router.get("/byId/:id", async (req, res) => {
+  const id = req.params.id;
+  const recipe = await Recipes.findByPk(id);
+  res.json(recipe);
+});
+
 module.exports = router;

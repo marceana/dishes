@@ -2,8 +2,11 @@ import React from "react";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 
 function CreateRecipe() {
+  const navigate = useNavigate();
+
   const initialValues = {
     title: "",
     ingredients: [""],
@@ -20,7 +23,7 @@ function CreateRecipe() {
 
   const onSubmit = (data) => {
     axios.post("http://localhost:3001/recipes", data).then((response) => {
-      console.log("Dados enviados com sucesso!");
+      navigate("/");
     });
   };
 
