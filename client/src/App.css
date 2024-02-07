@@ -41,7 +41,7 @@ body {
 
 /* HOME PAGE CSS */
 
-.recipePage {
+.recipesPage {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -161,4 +161,53 @@ body {
 
 span {
   color: red;
+}
+
+/* RECIPE PAGE CSS */
+
+.recipePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #9dbc98;
+  width: 100%;
+}
+
+.recipeTitle {
+  font-size: 34px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Image styling */
+.recipeImage {
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  border: 5px solid #f9efdb;
+}
+
+.recipeIngredientsTitle,
+.recipeInstructionsTitle {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: black;
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+
+.recipeIngredients {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 20px;
+}
+
+.recipeInstructions {
+  line-height: 1.5;
 }

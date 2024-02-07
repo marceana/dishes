@@ -13,10 +13,30 @@ function Recipe() {
   });
   return (
     <div className="recipePage">
-      <div className="title">{recipeObject.title}</div>
-      <img className="image" src={recipeObject.image} alt="recipe" />
-      <div className="ingredients">{recipeObject.ingredients}</div>
-      <div className="instructions">{recipeObject.instructions}</div>
+      <div className="recipeTitle">{recipeObject.title}</div>
+      <img className="recipeImage" src={recipeObject.image} alt="recipe" />
+      <div className="recipeIngredientsTitle">Ingredientes:</div>
+      <div className="recipeIngredients">
+        {recipeObject.ingredients &&
+          recipeObject.ingredients.map((value, key) => {
+            return (
+              <div key={key}>
+                {key + 1}. {value}
+              </div>
+            );
+          })}
+      </div>
+      <span className="recipeInstructionsTitle">Instruções:</span>
+      <div className="recipeInstructions">
+        {recipeObject.instructions &&
+          recipeObject.instructions.map((value, key) => {
+            return (
+              <div key={key}>
+                {key + 1}. {value}
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }

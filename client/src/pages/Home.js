@@ -23,7 +23,7 @@ function Home() {
   }
 
   return (
-    <div className="recipePage">
+    <div className="recipesPage">
       {listOfRecipes.map((value, index) => {
         const backgroundColor = getRandomColor();
         return (
