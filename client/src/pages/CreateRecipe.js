@@ -110,7 +110,7 @@ function CreateRecipe() {
             <Field
               id="inputCreateRecipe"
               name="image"
-              placeholder="Imagem da receita"
+              placeholder="Imagem da receita (URL)"
             />
 
             <button type="submit" onSubmit={onSubmit}>
