@@ -22,9 +22,19 @@ function CreateRecipe() {
   });
 
   const onSubmit = (data) => {
-    axios.post("http://localhost:3001/recipes", data).then((response) => {
-      navigate("/");
-    });
+    axios
+      .post("http://localhost:3001/recipes", data, {
+        headers: {
+          accessToken: sessionStorage.getItem("accessToken"),
+        },
+      })
+      .then((response) => {
+        if (response.data.error) {
+          console.log(response.data.error);
+        } else {
+          navigate("/");
+        }
+      });
   };
 
   return (

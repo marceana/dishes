@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  let navigate = useNavigate();
 
   const login = () => {
     const data = { username: username, password: password };
@@ -12,6 +15,7 @@ function Login() {
         alert(response.data.error);
       } else {
         sessionStorage.setItem("accessToken", response.data);
+        navigate("/");
       }
     });
   };
