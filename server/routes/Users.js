@@ -7,33 +7,54 @@ const { sign } = require("jsonwebtoken");
 
 router.post("/", async (req, res) => {
   const { username, password } = req.body;
-  bcrypt.hash(password, 10).then((hash) => {
-    Users.create({
+
+  try {
+    const hash = await bcrypt.hash(password, 10);
+
+    await Users.create({
       username: username,
       password: hash,
     });
-    res.json("SUCESS");
-  });
+
+    res.json("SUCCESS");
+  } catch (error) {
+    console.error(error);
+
+    res
+      .status(500)
+      .json({ message: "An error occurred while creating the user." });
+  }
 });
 
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await Users.findOne({ where: { username: username } });
+  try {
+    const user = await Users.findOne({ where: { username: username } });
 
-  if (!user) res.json({ error: "User not found" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-  console.log(user);
-
-  bcrypt.compare(password, user.password).then((match) => {
-    if (!match) res.json({ error: "Wrong username and password combination" });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res
+        .status(401)
+        .json({ error: "Wrong username and password combination" });
+    }
 
     const accessToken = sign(
       { username: user.username, id: user.id },
       "importantsecret"
     );
-    res.json(accessToken);
-  });
+
+    res.json({
+      accessToken: accessToken,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while logging in" });
+  }
 });
 
 module.exports = router;

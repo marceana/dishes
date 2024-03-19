@@ -10,14 +10,22 @@ function Login() {
 
   const login = () => {
     const data = { username: username, password: password };
-    axios.post("http://localhost:3001/auth/login", data).then((response) => {
-      if (response.data.error) {
-        alert(response.data.error);
-      } else {
-        sessionStorage.setItem("accessToken", response.data);
-        navigate("/");
-      }
-    });
+    axios
+      .post("http://localhost:3001/auth/login", data)
+      .then((response) => {
+        const { accessToken } = response.data;
+        if (accessToken) {
+          sessionStorage.setItem("accessToken", accessToken);
+
+          navigate("/");
+        } else {
+          alert("Token de acesso não recebido do servidor.");
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao fazer login:", error);
+        alert("Erro ao fazer login. Por favor, tente novamente mais tarde.");
+      });
   };
 
   return (
