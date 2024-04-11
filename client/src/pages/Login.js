@@ -15,7 +15,7 @@ function Login() {
       .then((response) => {
         const { accessToken } = response.data;
         if (accessToken) {
-          sessionStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("accessToken", accessToken);
 
           navigate("/");
         } else {

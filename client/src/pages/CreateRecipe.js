@@ -25,7 +25,7 @@ function CreateRecipe() {
     axios
       .post("http://localhost:3001/recipes", data, {
         headers: {
-          accessToken: sessionStorage.getItem("accessToken"),
+          accessToken: localStorage.getItem("accessToken"),
         },
       })
       .then((response) => {

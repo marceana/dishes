@@ -11,7 +11,7 @@ function Home() {
     axios
       .get("http://localhost:3001/recipes", {
         headers: {
-          accessToken: sessionStorage.getItem("accessToken"),
+          accessToken: localStorage.getItem("accessToken"),
         },
       })
       .then(
