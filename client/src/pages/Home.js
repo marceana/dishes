@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const [listOfRecipes, setLisOfRecipes] = useState([]);
+  const [listOfRecipes, setListOfRecipes] = useState([]);
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ function Home() {
       })
       .then(
         (response) => {
-          setLisOfRecipes(response.data);
+          setListOfRecipes(response.data);
         },
         (err) => console.log(err)
       );
@@ -30,22 +30,27 @@ function Home() {
 
   return (
     <div className="recipesPage">
-      {listOfRecipes.map((value, index) => {
-        const backgroundColor = getRandomColor();
-        return (
-          <div
-            className="recipe"
-            key={index}
-            style={{ backgroundColor }}
-            onClick={() => {
-              navigate(`/recipe/${value.id}`);
-            }}
-          >
-            <div className="title">{value.title}</div>
-            <img className="image" src={value.image} alt={value.title} />
-          </div>
-        );
-      })}
+      {listOfRecipes.length > 0 ? (
+        listOfRecipes.map((recipe, index) => {
+          const backgroundColor = getRandomColor();
+          return (
+            <div
+              className="recipe"
+              key={index}
+              style={{ backgroundColor }}
+              onClick={() => navigate(`/recipe/${recipe.id}`)}
+            >
+              <div className="title">{recipe.title}</div>
+              <img className="image" src={recipe.image} alt={recipe.title} />
+            </div>
+          );
+        })
+      ) : (
+        <div className="noRecipes">
+          Você ainda não possui receitas. <a href="#">Registre-se</a> ou{" "}
+          <a href="#">faça login</a> para começar a adicionar.
+        </div>
+      )}
     </div>
   );
 }
