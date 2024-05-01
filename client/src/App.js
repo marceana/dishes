@@ -29,6 +29,11 @@ function App() {
       });
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    setAuthState(false);
+  };
+
   return (
     <div className="App" style={{ background: color }}>
       <AuthContext.Provider value={{ authState, setAuthState }}>
@@ -38,9 +43,12 @@ function App() {
               Home
             </Link>
             {authState && (
-              <Link to="/createrecipe" onClick={() => changeColor("#9DBC98")}>
-                Anotar uma receita
-              </Link>
+              <>
+                <Link to="/createrecipe" onClick={() => changeColor("#9DBC98")}>
+                  Anotar uma receita
+                </Link>
+                <Link onClick={logout}>Logout</Link>
+              </>
             )}
             {!authState && (
               <>
