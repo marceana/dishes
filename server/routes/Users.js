@@ -50,6 +50,8 @@ router.post("/login", async (req, res) => {
 
     res.json({
       accessToken: accessToken,
+      username: username,
+      id: user.id,
     });
   } catch (error) {
     console.error(error);

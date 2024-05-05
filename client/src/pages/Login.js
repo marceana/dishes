@@ -17,8 +17,12 @@ function Login() {
       .then((response) => {
         const { accessToken } = response.data;
         if (accessToken) {
-          localStorage.setItem("accessToken", accessToken);
-          setAuthState(true);
+          localStorage.setItem("accessToken", response.data.accessToken);
+          setAuthState({
+            username: response.data.username,
+            id: response.data.id,
+            status: true,
+          });
 
           navigate("/");
         } else {

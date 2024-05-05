@@ -10,7 +10,11 @@ import { AuthContext } from "./helpers/AuthContext";
 import axios from "axios";
 
 function App() {
-  const [authState, setAuthState] = useState(false);
+  const [authState, setAuthState] = useState({
+    username: "",
+    id: 0,
+    status: false,
+  });
   const [color, changeColor] = useState("#E5E6E1");
 
   useEffect(() => {
@@ -22,16 +26,27 @@ function App() {
       })
       .then((response) => {
         if (response.data.error) {
-          setAuthState(false);
+          setAuthState({
+            ...authState,
+            status: false,
+          });
         } else {
-          setAuthState(true);
+          setAuthState({
+            username: response.data.username,
+            id: response.data.id,
+            status: true,
+          });
         }
       });
   }, []);
 
   const logout = () => {
     localStorage.removeItem("accessToken");
-    setAuthState(false);
+    setAuthState({
+      username: "",
+      id: 0,
+      status: false,
+    });
   };
 
   return (
@@ -42,15 +57,16 @@ function App() {
             <Link to="/" onClick={() => changeColor("#E5E6E1")}>
               Home
             </Link>
-            {authState && (
+            {authState.status && (
               <>
                 <Link to="/createrecipe" onClick={() => changeColor("#9DBC98")}>
                   Anotar uma receita
                 </Link>
                 <Link onClick={logout}>Logout</Link>
+                <h1>{authState.username}</h1>
               </>
             )}
-            {!authState && (
+            {!authState.status && (
               <>
                 <Link to="/login" onClick={() => changeColor("#638889")}>
                   Login
