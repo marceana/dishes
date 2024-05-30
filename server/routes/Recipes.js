@@ -25,4 +25,16 @@ router.get("/byId/:id", async (req, res) => {
   res.json(recipe);
 });
 
+router.delete("/:recipeId", validateToken, async (req, res) => {
+  const recipeId = req.params.recipeId;
+
+  await Recipes.destroy({
+    where: {
+      id: recipeId,
+    },
+  });
+
+  res.json("Deleted successfully");
+});
+
 module.exports = router;
