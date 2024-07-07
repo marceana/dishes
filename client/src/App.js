@@ -8,6 +8,7 @@ import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import { AuthContext } from "./helpers/AuthContext";
 import axios from "axios";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   const [authState, setAuthState] = useState({
@@ -83,6 +84,7 @@ function App() {
             <Route path="/recipe/:id" exact element={<Recipe />} />
             <Route path="/login" exact element={<Login />} />
             <Route path="/registration" exact element={<Registration />} />
+            <Route path="*" exact element={<PageNotFound />} />
           </Routes>
         </Router>
       </AuthContext.Provider>
