@@ -55,11 +55,11 @@ function App() {
       <AuthContext.Provider value={{ authState, setAuthState }}>
         <Router>
           <div className="navbar">
-            <Link to="/" onClick={() => changeColor("#E5E6E1")}>
-              Home
-            </Link>
             {authState.status && (
               <>
+                <Link to="/" onClick={() => changeColor("#E5E6E1")}>
+                  Home
+                </Link>
                 <Link to="/createrecipe" onClick={() => changeColor("#9DBC98")}>
                   Anotar uma receita
                 </Link>

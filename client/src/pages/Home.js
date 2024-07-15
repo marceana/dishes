@@ -1,26 +1,31 @@
-import React from "react";
+import React, { useContext } from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../helpers/AuthContext";
 
 function Home() {
   const [listOfRecipes, setListOfRecipes] = useState([]);
+  const { authState } = useContext(AuthContext);
   let navigate = useNavigate();
-  const hasAccessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/recipes", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then(
-        (response) => {
-          setListOfRecipes(response.data);
-        },
-        (err) => console.log(err)
-      );
+    if (!authState.status) {
+      navigate("/login");
+    } else {
+      axios
+        .get("http://localhost:3001/recipes", {
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        })
+        .then(
+          (response) => {
+            setListOfRecipes(response.data);
+          },
+          (err) => console.log(err)
+        );
+    }
   }, []);
 
   const deleteRecipe = (id) => {
@@ -47,12 +52,12 @@ function Home() {
 
   return (
     <div className="recipesPage">
-      {listOfRecipes && listOfRecipes.length === 0 && hasAccessToken ? (
+      {listOfRecipes && listOfRecipes.length === 0 && authState.status ? (
         <div className="noRecipes">
           Você ainda não possui receitas. <a href="#">Anote sua receita</a> para
           nunca mais esquecê-la!
         </div>
-      ) : listOfRecipes && listOfRecipes.length > 0 && hasAccessToken ? (
+      ) : listOfRecipes && listOfRecipes.length > 0 && authState.status ? (
         listOfRecipes.map((recipe, index) => {
           const backgroundColor = getRandomColor();
           return (
