@@ -26,7 +26,7 @@ function Home() {
           (err) => console.log(err)
         );
     }
-  }, []);
+  }, [authState.status, navigate]);
 
   const deleteRecipe = (id) => {
     axios
@@ -38,7 +38,7 @@ function Home() {
       .then(() => {
         setListOfRecipes(
           listOfRecipes.filter((value) => {
-            return value.id != id;
+            return value.id !== id;
           })
         );
       });

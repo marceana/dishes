@@ -20,7 +20,7 @@ function CreateRecipe() {
     if (!authState.status) {
       navigate("login");
     }
-  }, []);
+  }, [authState.status, navigate]);
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Campo obrigatório"),
