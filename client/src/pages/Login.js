@@ -6,16 +6,20 @@ import { AuthContext } from "../helpers/AuthContext";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { setAuthState } = useContext(AuthContext);
 
   let navigate = useNavigate();
 
   const login = () => {
+    setIsLoading(true);
     const data = { username: username, password: password };
+
     axios
       .post("http://localhost:3001/auth/login", data)
       .then((response) => {
         const { accessToken } = response.data;
+
         if (accessToken) {
           localStorage.setItem("accessToken", response.data.accessToken);
           setAuthState({
@@ -32,6 +36,9 @@ function Login() {
       .catch((error) => {
         console.error("Erro ao fazer login:", error);
         alert("Erro ao fazer login. Por favor, tente novamente mais tarde.");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -39,7 +46,9 @@ function Login() {
     <div className="loginPage">
       <div className="formContainer">
         <h1 className="title">Bem-vindo(a) de volta!</h1>
+
         <label htmlFor="user">Usuário: </label>
+
         <input
           type="text"
           name="username"
@@ -48,8 +57,11 @@ function Login() {
             setUsername(event.target.value);
           }}
           placeholder="Usuário"
+          disabled={isLoading}
         />
+
         <label htmlFor="password">Senha: </label>
+
         <input
           type="password"
           name="password"
@@ -58,8 +70,12 @@ function Login() {
             setPassword(event.target.value);
           }}
           placeholder="Senha"
+          disabled={isLoading}
         />
-        <button onClick={login}>Login</button>
+
+        <button onClick={login} disabled={isLoading}>
+          {isLoading ? "Carregando..." : "Login"}
+        </button>
       </div>
     </div>
   );
