@@ -1,82 +1,110 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const { setAuthState } = useContext(AuthContext);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  let navigate = useNavigate();
+  const initialValues = {
+    username: "",
+    password: "",
+  };
 
-  const login = () => {
-    setIsLoading(true);
-    const data = { username: username, password: password };
+  const validationSchema = Yup.object().shape({
+    username: Yup.string().required("Usuário é obrigatório"),
+    password: Yup.string().required("Senha é obrigatória"),
+  });
 
-    axios
-      .post("http://localhost:3001/auth/login", data)
-      .then((response) => {
-        const { accessToken } = response.data;
+  const onSubmit = async (data, { setSubmitting }) => {
+    setError("");
 
-        if (accessToken) {
-          localStorage.setItem("accessToken", response.data.accessToken);
-          setAuthState({
-            username: response.data.username,
-            id: response.data.id,
-            status: true,
-          });
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/auth/login",
+        data
+      );
 
-          navigate("/");
-        } else {
-          alert("Token de acesso não recebido do servidor.");
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao fazer login:", error);
-        alert("Erro ao fazer login. Por favor, tente novamente mais tarde.");
-      })
-      .finally(() => {
-        setIsLoading(false);
+      const { accessToken, username, id } = response.data;
+
+      if (!accessToken) {
+        throw new Error("Token não recebido");
+      }
+
+      localStorage.setItem("accessToken", accessToken);
+
+      setAuthState({
+        username,
+        id,
+        status: true,
       });
+
+      navigate("/");
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+
+      if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else if (error.request) {
+        setError("Servidor indisponível. Tente novamente.");
+      } else {
+        setError("Erro inesperado. Tente novamente.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="loginPage">
-      <div className="formContainer">
-        <h1 className="title">Bem-vindo(a) de volta!</h1>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+      >
+        {({ isSubmitting, handleChange }) => (
+          <Form className="formContainer">
+            <h1 className="title">Bem-vindo(a) de volta!</h1>
 
-        <label htmlFor="user">Usuário: </label>
+            <label>Usuário:</label>
+            <Field
+              id="inputLogin"
+              name="username"
+              placeholder="Usuário"
+              disabled={isSubmitting}
+              onChange={(e) => {
+                handleChange(e);
+                setError("");
+              }}
+            />
+            <ErrorMessage name="username" component="span" />
 
-        <input
-          type="text"
-          name="username"
-          id="inputLogin"
-          onChange={(event) => {
-            setUsername(event.target.value);
-          }}
-          placeholder="Usuário"
-          disabled={isLoading}
-        />
+            <label>Senha:</label>
+            <Field
+              id="inputLogin"
+              name="password"
+              type="password"
+              placeholder="Senha"
+              disabled={isSubmitting}
+              onChange={(e) => {
+                handleChange(e);
+                setError("");
+              }}
+            />
+            <ErrorMessage name="password" component="span" />
 
-        <label htmlFor="password">Senha: </label>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Carregando..." : "Login"}
+            </button>
 
-        <input
-          type="password"
-          name="password"
-          id="inputLogin"
-          onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-          placeholder="Senha"
-          disabled={isLoading}
-        />
-
-        <button onClick={login} disabled={isLoading}>
-          {isLoading ? "Carregando..." : "Login"}
-        </button>
-      </div>
+            {error && <p className="error">{error}</p>}
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 }

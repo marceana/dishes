@@ -9,20 +9,42 @@ router.post("/", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    if (!username || !password) {
+      return res.status(400).json({
+        error: "Username and password are required",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        error: "Password must be at least 6 characters",
+      });
+    }
+
+    const existingUser = await Users.findOne({ where: { username } });
+
+    if (existingUser) {
+      return res.status(409).json({
+        error: "Username already exists",
+      });
+    }
+
     const hash = await bcrypt.hash(password, 10);
 
     await Users.create({
-      username: username,
+      username,
       password: hash,
     });
 
-    res.json("SUCCESS");
+    return res.status(201).json({
+      message: "User created successfully",
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Register error:", error);
 
-    res
-      .status(500)
-      .json({ message: "An error occurred while creating the user." });
+    return res.status(500).json({
+      error: "Internal server error",
+    });
   }
 });
 
@@ -30,32 +52,38 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await Users.findOne({ where: { username: username } });
+    const user = await Users.findOne({ where: { username } });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(401).json({
+        error: "Invalid username or password",
+      });
     }
 
     const match = await bcrypt.compare(password, user.password);
+
     if (!match) {
-      return res
-        .status(401)
-        .json({ error: "Wrong username and password combination" });
+      return res.status(401).json({
+        error: "Invalid username or password",
+      });
     }
 
     const accessToken = sign(
       { username: user.username, id: user.id },
-      "importantsecret"
+      process.env.JWT_SECRET || "importantsecret"
     );
 
-    res.json({
-      accessToken: accessToken,
-      username: username,
+    return res.json({
+      accessToken,
+      username: user.username,
       id: user.id,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "An error occurred while logging in" });
+    console.error("Login error:", error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
   }
 });
 
