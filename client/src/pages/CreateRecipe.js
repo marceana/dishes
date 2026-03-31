@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
 
 function CreateRecipe() {
+  const [error, setError] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const navigate = useNavigate();
   const { authState } = useContext(AuthContext);
 
@@ -18,31 +21,47 @@ function CreateRecipe() {
 
   useEffect(() => {
     if (!authState.status) {
-      navigate("login");
+      navigate("/login");
     }
   }, [authState.status, navigate]);
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Campo obrigatório"),
-    ingredients: Yup.array().of(Yup.string().required("Campo obrigatório")),
-    instructions: Yup.array().of(Yup.string().required("Campo obrigatório")),
-    image: Yup.string().required("Campo obrigatório e deve ser uma url!"),
+    ingredients: Yup.array()
+      .of(Yup.string().required("Campo obrigatório"))
+      .min(1, "Adicione pelo menos um ingrediente"),
+    instructions: Yup.array()
+      .of(Yup.string().required("Campo obrigatório"))
+      .min(1, "Adicione pelo menos uma instrução"),
+    image: Yup.string()
+      .url("Deve ser uma URL válida")
+      .required("Campo obrigatório"),
   });
 
-  const onSubmit = (data) => {
-    axios
-      .post("http://localhost:3001/recipes", data, {
+  const onSubmit = async (data, { setSubmitting }) => {
+    setError("");
+    setIsLoading(true);
+
+    try {
+      await axios.post("http://localhost:3001/recipes", data, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log(response.data.error);
-        } else {
-          navigate("/");
-        }
       });
+
+      navigate("/");
+    } catch (error) {
+      console.error("Erro ao criar receita:", error);
+
+      if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Erro ao criar receita. Tente novamente.");
+      }
+    } finally {
+      setIsLoading(false);
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -131,9 +150,11 @@ function CreateRecipe() {
               placeholder="Imagem da receita (URL)"
             />
 
-            <button type="submit" onSubmit={onSubmit}>
-              Enviar receita
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? "Enviando..." : "Enviar receita"}
             </button>
+
+            {error && <p className="error">{error}</p>}
           </Form>
         )}
       </Formik>

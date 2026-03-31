@@ -6,42 +6,54 @@ import { AuthContext } from "../helpers/AuthContext";
 
 function Home() {
   const [listOfRecipes, setListOfRecipes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const { authState } = useContext(AuthContext);
   let navigate = useNavigate();
 
   useEffect(() => {
     if (!authState.status) {
       navigate("/login");
-    } else {
-      axios
-        .get("http://localhost:3001/recipes", {
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        })
-        .then(
-          (response) => {
-            setListOfRecipes(response.data);
-          },
-          (err) => console.log(err)
-        );
     }
   }, [authState.status, navigate]);
 
-  const deleteRecipe = (id) => {
-    axios
-      .delete(`http://localhost:3001/recipes/${id}`, {
+  useEffect(() => {
+    if (!authState.status) return;
+
+    fetchRecipes();
+  }, [authState.status]);
+
+  const fetchRecipes = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.get("http://localhost:3001/recipes", {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
-      })
-      .then(() => {
-        setListOfRecipes(
-          listOfRecipes.filter((value) => {
-            return value.id !== id;
-          })
-        );
       });
+      setListOfRecipes(response.data);
+    } catch (err) {
+      setError("Erro ao carregar receitas.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteRecipe = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3001/recipes/${id}`, {
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      });
+
+      setListOfRecipes((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      console.error("Erro ao deletar:", err);
+    }
   };
 
   function getRandomColor() {
@@ -50,44 +62,61 @@ function Home() {
     return colors[randomIndex];
   }
 
+  if (isLoading) return <p>Carregando receitas...</p>;
+
+  if (error) return <p className="error">{error}</p>;
+
+  if (!authState.status) {
+    return (
+      <div className="recipesPage">
+        <div className="noRecipes">
+          Você ainda não possui receitas.{" "}
+          <span onClick={() => navigate("/register")}>Registre-se</span> ou{" "}
+          <span onClick={() => navigate("/login")}>faça login</span> para
+          começar a adicionar.
+        </div>
+      </div>
+    );
+  }
+
+  if (listOfRecipes.length === 0) {
+    return (
+      <div className="recipesPage">
+        <div className="noRecipes">
+          Você ainda não possui receitas.{" "}
+          <span onClick={() => navigate("/createrecipe")}>
+            Anote sua receita
+          </span>{" "}
+          para nunca mais esquecê-la!
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="recipesPage">
-      {listOfRecipes && listOfRecipes.length === 0 && authState.status ? (
-        <div className="noRecipes">
-          Você ainda não possui receitas. <a href="#">Anote sua receita</a> para
-          nunca mais esquecê-la!
-        </div>
-      ) : listOfRecipes && listOfRecipes.length > 0 && authState.status ? (
-        listOfRecipes.map((recipe, index) => {
-          const backgroundColor = getRandomColor();
-          return (
-            <div
-              className="recipe"
-              key={index}
-              style={{ backgroundColor }}
-              onClick={() => navigate(`/recipe/${recipe.id}`)}
+      {listOfRecipes.map((recipe) => (
+        <div
+          className="recipe"
+          key={recipe.id}
+          style={{ backgroundColor: colors[recipe.id % colors.length] }}
+          onClick={() => navigate(`/recipe/${recipe.id}`)}
+        >
+          <div className="title">
+            {recipe.title}
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                deleteRecipe(recipe.id);
+              }}
             >
-              <div className="title">
-                {recipe.title}{" "}
-                <button
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    deleteRecipe(recipe.id);
-                  }}
-                >
-                  X
-                </button>
-              </div>
-              <img className="image" src={recipe.image} alt={recipe.title} />
-            </div>
-          );
-        })
-      ) : (
-        <div className="noRecipes">
-          Você ainda não possui receitas. <a href="#">Registre-se</a> ou{" "}
-          <a href="#">faça login</a> para começar a adicionar.
+              X
+            </button>
+          </div>
+
+          <img className="image" src={recipe.image} alt={recipe.title} />
         </div>
-      )}
+      ))}
     </div>
   );
 }
