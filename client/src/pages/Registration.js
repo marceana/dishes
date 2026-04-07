@@ -1,8 +1,8 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axios";
 
 function Registration() {
   const [error, setError] = React.useState("");
@@ -32,7 +32,7 @@ function Registration() {
     setSuccess("");
 
     try {
-      await axios.post("http://localhost:3001/auth", data);
+      await API.post("/auth", data);
 
       setSuccess("Conta criada com sucesso!");
       resetForm();

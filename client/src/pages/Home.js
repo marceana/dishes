@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
+import API from "../api/axios";
 
 function Home() {
   const [listOfRecipes, setListOfRecipes] = useState([]);
@@ -29,11 +29,7 @@ function Home() {
     setError("");
 
     try {
-      const response = await axios.get("http://localhost:3001/recipes", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      });
+      const response = await API.get("/recipes");
       setListOfRecipes(response.data);
     } catch (err) {
       setError("Erro ao carregar receitas.");
@@ -44,11 +40,7 @@ function Home() {
 
   const deleteRecipe = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/recipes/${id}`, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      });
+      await API.delete(`/recipes/${id}`);
 
       setListOfRecipes((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {

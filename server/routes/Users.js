@@ -68,13 +68,23 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined");
+    }
+
     const accessToken = sign(
       { username: user.username, id: user.id },
-      process.env.JWT_SECRET || "importantsecret"
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false, // (TOD0 - SHOULD BE TRUE IN PROD)
+      sameSite: "lax",
+    });
+
     return res.json({
-      accessToken,
       username: user.username,
       id: user.id,
     });
@@ -89,6 +99,16 @@ router.post("/login", async (req, res) => {
 
 router.get("/isAuthenticated", validateToken, (req, res) => {
   res.json(req.user);
+});
+
+router.post("/logout", (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false, // (TOD0 - SHOULD BE TRUE IN PROD)
+  });
+
+  return res.json({ message: "Logged out successfully" });
 });
 
 module.exports = router;

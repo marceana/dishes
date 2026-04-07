@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api/axios";
 
 function Recipe() {
   let { id } = useParams();
@@ -8,21 +8,15 @@ function Recipe() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/recipes/byId/${id}`).then((response) => {
+    API.get(`/recipes/byId/${id}`).then((response) => {
       setRecipeObject(response.data);
     });
   });
 
   const deleteRecipe = (id) => {
-    axios
-      .delete(`http://localhost:3001/recipes/${id}`, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then(() => {
-        setRecipeObject({});
-      });
+    API.delete(`/recipes/${id}`).then(() => {
+      setRecipeObject({});
+    });
   };
 
   return (

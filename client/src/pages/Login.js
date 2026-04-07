@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import API from "../api/axios";
 
 function Login() {
   const { setAuthState } = useContext(AuthContext);
@@ -24,18 +24,9 @@ function Login() {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/auth/login",
-        data
-      );
+      const response = await API.post("/auth/login", data);
 
-      const { accessToken, username, id } = response.data;
-
-      if (!accessToken) {
-        throw new Error("Token não recebido");
-      }
-
-      localStorage.setItem("accessToken", accessToken);
+      const { username, id } = response.data;
 
       setAuthState({
         username,
@@ -76,10 +67,7 @@ function Login() {
               name="username"
               placeholder="Usuário"
               disabled={isSubmitting}
-              onChange={(e) => {
-                handleChange(e);
-                setError("");
-              }}
+              onFocus={() => setError("")}
             />
             <ErrorMessage name="username" component="span" />
 
@@ -90,10 +78,7 @@ function Login() {
               type="password"
               placeholder="Senha"
               disabled={isSubmitting}
-              onChange={(e) => {
-                handleChange(e);
-                setError("");
-              }}
+              onFocus={() => setError("")}
             />
             <ErrorMessage name="password" component="span" />
 

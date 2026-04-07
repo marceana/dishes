@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
-import axios from "axios";
 import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
+import API from "../api/axios";
 
 function CreateRecipe() {
   const [error, setError] = React.useState("");
@@ -43,11 +43,7 @@ function CreateRecipe() {
     setIsLoading(true);
 
     try {
-      await axios.post("http://localhost:3001/recipes", data, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      });
+      await API.post("/recipes", data);
 
       navigate("/");
     } catch (error) {

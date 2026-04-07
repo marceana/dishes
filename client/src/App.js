@@ -7,8 +7,8 @@ import Recipe from "./pages/Recipe";
 import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import { AuthContext } from "./helpers/AuthContext";
-import axios from "axios";
 import PageNotFound from "./pages/PageNotFound";
+import API from "./api/axios";
 
 function App() {
   const [authState, setAuthState] = useState({
@@ -19,30 +19,27 @@ function App() {
   const [color, changeColor] = useState("#E5E6E1");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/auth/isAuthenticated", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          setAuthState({
-            ...authState,
-            status: false,
-          });
-        } else {
-          setAuthState({
-            username: response.data.username,
-            id: response.data.id,
-            status: true,
-          });
-        }
-      });
+    API.get("/auth/isAuthenticated", {
+      withCredentials: true,
+    }).then((response) => {
+      if (response.data.error) {
+        setAuthState((prev) => ({
+          ...prev,
+          status: false,
+        }));
+      } else {
+        setAuthState({
+          username: response.data.username,
+          id: response.data.id,
+          status: true,
+        });
+      }
+    });
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("accessToken");
+  const logout = async () => {
+    await API.post("/auth/logout");
+
     setAuthState({
       username: "",
       id: 0,
