@@ -91,7 +91,7 @@ function Home() {
         <div
           className="recipe"
           key={recipe.id}
-          style={{ backgroundColor: colors[recipe.id % colors.length] }}
+          style={{ backgroundColor: getRandomColor() }}
           onClick={() => navigate(`/recipe/${recipe.id}`)}
         >
           <div className="title">

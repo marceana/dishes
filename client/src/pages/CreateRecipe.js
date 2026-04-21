@@ -33,9 +33,13 @@ function CreateRecipe() {
     instructions: Yup.array()
       .of(Yup.string().required("Campo obrigatório"))
       .min(1, "Adicione pelo menos uma instrução"),
-    image: Yup.string()
-      .url("Deve ser uma URL válida")
-      .required("Campo obrigatório"),
+    image: Yup.mixed()
+      .required("Campo obrigatório")
+      .test("fileType", "Formato inválido", (value) =>
+        value instanceof File
+          ? ["image/jpg", "image/png", "image/webp"].includes(value.type)
+          : typeof value === "string"
+      ),
   });
 
   const onSubmit = async (data, { setSubmitting }) => {
@@ -67,7 +71,7 @@ function CreateRecipe() {
         onSubmit={onSubmit}
         validationSchema={validationSchema}
       >
-        {({ values }) => (
+        {({ values, setFieldValue }) => (
           <Form className="formContainer">
             <h1 className="title">Guarde sua receita!</h1>
             <label htmlFor="title">Nome da receita: </label>
@@ -140,10 +144,27 @@ function CreateRecipe() {
 
             <label htmlFor="image">Imagem: </label>
             <ErrorMessage name="image" component="span" />
-            <Field
-              id="inputCreateRecipe"
-              name="image"
-              placeholder="Imagem da receita (URL)"
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.currentTarget.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append(
+                  "upload_preset",
+                  process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+                );
+
+                const res = await fetch(
+                  `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                  { method: "POST", body: formData }
+                );
+                const data = await res.json();
+                setFieldValue("image", data.secure_url); // just a URL string
+              }}
             />
 
             <button type="submit" disabled={isLoading}>
