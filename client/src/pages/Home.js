@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
 import API from "../api/axios";
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 
 function Home() {
   const [listOfRecipes, setListOfRecipes] = useState([]);
@@ -48,12 +49,6 @@ function Home() {
     }
   };
 
-  function getRandomColor() {
-    const colors = ["#fabfb7", "#fdf9c4", "#ffda9e", "#c5c6c8", "#b2e2f2"];
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  }
-
   if (isLoading) return <p>Carregando receitas...</p>;
 
   if (error) return <p className="error">{error}</p>;
@@ -86,29 +81,38 @@ function Home() {
   }
 
   return (
-    <div className="recipesPage">
-      {listOfRecipes.map((recipe) => (
-        <div
-          className="recipe"
-          key={recipe.id}
-          style={{ backgroundColor: getRandomColor() }}
-          onClick={() => navigate(`/recipe/${recipe.id}`)}
-        >
-          <div className="title">
-            {recipe.title}
-            <button
-              onClick={(event) => {
-                event.stopPropagation();
-                deleteRecipe(recipe.id);
-              }}
-            >
-              X
-            </button>
-          </div>
-
-          <img className="image" src={recipe.image} alt={recipe.title} />
-        </div>
-      ))}
+    <div className="container mx-auto p-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {listOfRecipes.map((recipe) => (
+          <Card
+            key={recipe.id}
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => navigate(`/recipe/${recipe.id}`)}
+          >
+            <CardHeader className="relative">
+              <CardTitle className="flex justify-between items-center pr-8">
+                {recipe.title}
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    deleteRecipe(recipe.id);
+                  }}
+                  className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors"
+                >
+                  ✕
+                </button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <img
+                className="w-full h-48 object-cover rounded-lg"
+                src={recipe.image}
+                alt={recipe.title}
+              />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
